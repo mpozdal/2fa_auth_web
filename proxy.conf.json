@@ -1,0 +1,14 @@
+{
+  "/api/auth": {
+    "target": "https://localhost:7011",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/api/2fa": {
+    "target": "https://localhost:7012",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

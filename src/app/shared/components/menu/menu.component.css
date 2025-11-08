@@ -1,0 +1,147 @@
+.main-menu {
+  width: 100%;
+  height: 60px;
+  background-color: #fff;
+  padding: 0 2rem;
+  box-sizing: border-box;
+}
+
+.menu-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* --- Style Logo (lewa strona) --- */
+.menu-item-logo {
+  /* TO JEST NOWA, KLUCZOWA ZASADA: */
+  margin-right: auto; /* To wypycha wszystko inne na prawą stronę */
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  height: 100%;
+}
+
+.logo-image {
+  height: 32px;
+  width: 32px;
+  margin-right: 0.5rem;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+}
+
+/* --- Style nawigacji (prawa strona) --- */
+
+/* USUNIĘTO KLASĘ .menu-item-right-push */
+
+.menu-item {
+  margin-left: 0.5rem;
+}
+
+/* Zerujemy margines dla pierwszego elementu (logo) */
+.menu-item:first-child {
+  margin-left: 0;
+}
+
+.menu-item a.nav-link {
+  display: block;
+  padding: 0 1.5rem;
+  line-height: 60px;
+  text-decoration: none;
+  color: #555;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: relative;
+  transition: color 0.2s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-item a.nav-link:hover,
+.menu-item a.nav-link.active {
+  color: #3f51b5;
+}
+
+.menu-item a.nav-link:hover::after,
+.menu-item a.nav-link.active::after {
+  width: 100%;
+}
+
+.menu-button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  line-height: normal;
+  border: 2px solid transparent;
+  margin: 0;
+}
+
+.menu-button.menu-button-primary {
+  background-color: #3f51b5;
+  border-color: #3f51b5;
+  color: #ffffff;
+}
+
+.menu-button.menu-button-primary:hover {
+  opacity: 0.9;
+}
+
+.menu-button.menu-button-secondary {
+  background-color: transparent;
+  border-color: #3f51b5;
+  color: #3f51b5;
+}
+
+.menu-button.menu-button-secondary:hover {
+  background-color: #3f51b5;
+  color: #ffffff;
+}
+
+.menu-button.menu-button-danger {
+  background-color: transparent;
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.menu-button.menu-button-danger:hover {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .main-menu {
+    padding: 0 1rem;
+  }
+  .logo-text {
+    display: none;
+  }
+  .menu-item-logo {
+    margin-right: auto;
+  }
+  .menu-item a.nav-link {
+    padding: 0 0.8rem;
+    font-size: 0.9rem;
+  }
+  .menu-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  .menu-item {
+    margin-left: 0.25rem;
+  }
+}

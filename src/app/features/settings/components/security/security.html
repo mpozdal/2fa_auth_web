@@ -1,0 +1,70 @@
+<div class="setting-card" [class.is-expanded]="isExpanded()">
+  <div class="card-header">
+    <div class="card-icon-wrapper">
+      <mat-icon class="card-icon">security</mat-icon>
+    </div>
+
+    <div class="card-content">
+      @if(!twoFactorEnabled()) {
+      <h3 class="card-title">Enable Two Factor Authentication</h3>
+      } @else {
+      <h3 class="card-title">Two Factor Authentication is Enabled</h3>
+      }
+      <p class="card-description">Use Google Authenticator to sign in!</p>
+    </div>
+
+    <div class="card-action">
+      @if(!twoFactorEnabled()) {
+      <button
+        class="menu-button menu-button-primary"
+        (click)="enableTwoFactor()"
+        [disabled]="isExpanded()"
+      >
+        ENABLE
+      </button>
+      } @else {
+      <button class="menu-button menu-button-danger" (click)="disableTwoFactor()">DISABLE</button>
+      }
+    </div>
+  </div>
+
+  <div class="expansion-panel">
+    @if (isExpanded()) { @if (expansionStep() === 1) {
+    <div class="step-content">
+      <p class="step-guide">Scan the QR code with your authenticator app.</p>
+
+      @if (qrCodeData()) {
+      <div class="qr-code-container">
+        <img [src]="qrCodeData()!" />
+      </div>
+      }
+
+      <p class="step-guide">Or enter this key manually:</p>
+      <div class="entry-key-container">
+        <span class="entry-key-text">{{ manualEntryKey() }}</span>
+        <button mat-icon-button (click)="copyKeyToClipboard()" aria-label="Copy key">
+          <mat-icon>content_copy</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="expansion-actions">
+      <button class="menu-button menu-button-secondary" (click)="cancelExpansion()">CANCEL</button>
+      <button class="menu-button menu-button-primary" (click)="expansionStep.set(2)">NEXT</button>
+    </div>
+    } @if (expansionStep() === 2) {
+    <div class="step-content">
+      <p class="step-guide">Enter the 6-digit code from your app to complete setup.</p>
+      <div class="qr-code-container">
+        <mat-label>Code</mat-label>
+        <ng-otp-input config="config" [formControl]="verificationCode" />
+      </div>
+    </div>
+
+    <div class="expansion-actions">
+      <button class="menu-button menu-button-secondary" (click)="expansionStep.set(1)">BACK</button>
+      <button class="menu-button menu-button-primary" (click)="submitVerification()">VERIFY</button>
+    </div>
+    } }
+  </div>
+</div>

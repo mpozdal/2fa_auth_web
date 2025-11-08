@@ -1,0 +1,24 @@
+<nav class="main-menu">
+  <ul class="menu-list">
+    <li class="menu-item-logo">
+      <a routerLink="/" class="logo-link">
+        <span class="logo-text">TORUS.</span>
+      </a>
+    </li>
+
+    @if (isLoggedIn()) {
+    <li class="menu-item">
+      <a class="nav-link" routerLink="/settings" routerLinkActive="active">
+        <mat-icon>settings</mat-icon>
+      </a>
+    </li>
+    <li class="menu-item">
+      <button (click)="onLogout()" class="menu-button menu-button-danger">LOGOUT</button>
+    </li>
+    } @else {
+    <li class="menu-item">
+      <a routerLink="/login" class="menu-button menu-button-primary"> SIGN IN </a>
+    </li>
+    }
+  </ul>
+</nav>

@@ -1,0 +1,76 @@
+<app-go-back />
+
+<div class="login-container">
+  <p-toast />
+  @if(isLoading()) {
+  <div class="spinner-container">
+    <mat-spinner diameter="100"></mat-spinner>
+  </div>
+  }
+  <div class="login-form-section">
+    <mat-card class="login-card">
+      <mat-card-header>
+        <mat-card-title>Hello,</mat-card-title>
+        <mat-card-title>Welcome Back!</mat-card-title>
+        @if(is2FARequired()) {
+        <mat-card-subtitle>Enter code from Authenticator app.</mat-card-subtitle>
+        } @else {
+        <mat-card-subtitle>Sign in to continue.</mat-card-subtitle>
+        }
+      </mat-card-header>
+      <mat-card-content>
+        @if(is2FARequired()) {
+
+        <form [formGroup]="twoFAForm" (ngSubmit)="on2FASubmit()">
+          <div class="two-fa-container">
+            <mat-label>Code</mat-label>
+            <ng-otp-input
+              formControlName="code"
+              (onInputChange)="onOtpChange($event)"
+              config="config"
+            />
+          </div>
+
+          <button matFab class="login-button" type="submit">Sign in</button>
+        </form>
+        } @else {
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="inputs">
+            <mat-form-field class="full-width-input" appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput placeholder="example@example.com" required formControlName="email" />
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field class="full-width-input" appearance="outline">
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                type="password"
+                placeholder="•••••••••••••"
+                required
+                formControlName="password"
+              />
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+            <a class="forgot" routerLink="/reset-password">Forgot password?</a>
+          </div>
+
+          <button matFab class="login-button" type="submit">Sign in</button>
+        </form>
+        <div class="footer">
+          Don't have an account? <a class="sign-up-btn" routerLink="/register">Sign Up</a>
+        </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="login-image-section">
+    @if(is2FARequired()) {
+    <img ngSrc="2faLogin.svg" width="10" height="10" priority />
+    }@else {
+    <img ngSrc="login.svg" width="10" height="10" priority />
+    }
+  </div>
+</div>
