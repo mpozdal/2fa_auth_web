@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Observable, tap, catchError, throwError, map } from 'rxjs';
 import { Router } from '@angular/router';
 import { API_ENDPOINTS } from '../../../../api.constants';
-import { AuthResponse, LoginCredentials } from '../models/auth.models';
+import { AuthResponse, LoginCredentials, RegisterCredentials } from '../models/auth.models';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
@@ -14,7 +14,6 @@ export class AuthService {
   public readonly accessToken = signal<string | null>(null);
   private readonly userId = signal<string | null>(null);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly router = inject(Router);
 
   public readonly isLoggedIn = computed(() => !!this.accessToken());
 
@@ -37,6 +36,14 @@ export class AuthService {
           return throwError(() => error);
         })
       );
+  }
+
+  public register(registerCredentials: RegisterCredentials): Observable<any> {
+    return this.httpClient.post<any>(API_ENDPOINTS.AUTH.REGISTER, registerCredentials, {}).pipe(
+      catchError((error: HttpErrorResponse) => {
+        return throwError(() => error);
+      })
+    );
   }
 
   public refreshSession(): Observable<AuthResponse> {

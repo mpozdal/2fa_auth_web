@@ -57,13 +57,53 @@
       <p class="step-guide">Enter the 6-digit code from your app to complete setup.</p>
       <div class="qr-code-container">
         <mat-label>Code</mat-label>
-        <ng-otp-input config="config" [formControl]="verificationCode" />
+        <ng-otp-input
+          config="config"
+          [formControl]="verificationCode"
+          (onInputChange)="onOtpChange($event)"
+        />
       </div>
     </div>
 
     <div class="expansion-actions">
       <button class="menu-button menu-button-secondary" (click)="expansionStep.set(1)">BACK</button>
       <button class="menu-button menu-button-primary" (click)="submitVerification()">VERIFY</button>
+    </div>
+    } @if(expansionStep() === 3) {
+    <div class="step-content recovery-step">
+      <div class="recovery-warning">
+        <mat-icon color="warn">warning_amber</mat-icon>
+        <h3 class="step-guide-title">Save Your Recovery Codes!</h3>
+      </div>
+      <p class="step-guide">
+        You will only see these codes <b>once</b>. Store them in a secure place. You will need them
+        if you lose access to your authenticator app.
+      </p>
+
+      <div class="recovery-codes-container">
+        <div class="recovery-codes-grid">
+          @for(code of recoveryCodes(); track $index) {
+          <div class="recovery-code-chip">{{ code }}</div>
+          }
+        </div>
+      </div>
+
+      <div class="recovery-code-actions">
+        <button (click)="copyCodesToClipboard()" class="menu-button menu-button-secondary">
+          <mat-icon>content_copy</mat-icon>
+          Copy all
+        </button>
+        <button (click)="downloadCodesAsTxt()" class="menu-button menu-button-secondary">
+          <mat-icon>download</mat-icon>
+          Download
+        </button>
+      </div>
+    </div>
+
+    <div class="expansion-actions">
+      <button class="menu-button menu-button-primary" (click)="finishSetup()">
+        I have saved my codes
+      </button>
     </div>
     } }
   </div>

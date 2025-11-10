@@ -1,14 +1,11 @@
-// Twój istniejący plik 'security.ts'
-
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core'; // Dodaj writableSignal
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { UserInfo, UserService } from './services/user.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatIconModule } from '@angular/material/icon'; // Dodaj MatIconModule
-import { TwoFAService } from './services/two-fa.service'; // Załóżmy, że SetupResponse jest tutaj
+import { MatIconModule } from '@angular/material/icon';
+import { TwoFAService } from './services/two-fa.service';
 import { switchMap, tap } from 'rxjs';
 import { MatDialogModule } from '@angular/material/dialog';
 
-// Importy dla rozwijanej karty
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard';
 import { ReactiveFormsModule, FormControl, Validators, FormGroup } from '@angular/forms';
-import { SetupResponse } from '../../../../shared/models/app.types';
+import { Enable2FAResponse, SetupResponse } from '../../../../shared/models/app.types';
 import { NgOtpInputConfig, NgOtpInputModule } from 'ng-otp-input';
 @Component({
   selector: 'app-security',
@@ -43,12 +40,14 @@ export class Security implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
 
   protected readonly userInfo = signal<UserInfo | null>(null);
-  protected readonly twoFactorEnabled = computed(() => !!this.userInfo()?.twoFactorEnabled);
 
+  protected readonly recoveryCodes = signal<string[]>([]);
   protected readonly isExpanded = signal<boolean>(false);
-  protected readonly expansionStep = signal<1 | 2>(1);
+  protected readonly expansionStep = signal<1 | 2 | 3>(1);
   protected readonly qrCodeData = signal<string | null>(null);
   protected readonly manualEntryKey = signal<string | null>(null);
+
+  protected readonly twoFactorEnabled = computed(() => !!this.userInfo()?.twoFactorEnabled);
 
   public verificationCode = new FormControl('', [
     Validators.required,
@@ -67,6 +66,12 @@ export class Security implements OnInit {
     this.initUserInfo();
   }
 
+  protected onOtpChange(event: string): void {
+    if (event.length === 6) {
+      this.submitVerification();
+    }
+  }
+
   private initUserInfo(): void {
     this.userService
       .getUserInfo()
@@ -75,9 +80,31 @@ export class Security implements OnInit {
         this.userInfo.set(res);
       });
   }
+  protected finishSetup(): void {
+    this.isExpanded.set(false);
+    this.recoveryCodes.set([]);
+  }
 
-  protected verifyTwoFactor(): void {
-    this.twoFAService.enable(this.verificationCode.value ?? '').subscribe();
+  protected copyCodesToClipboard(): void {
+    const codesString = this.recoveryCodes().join('\n');
+    if (this.clipboard.copy(codesString)) {
+      this.snackBar.open('Recovery codes copied to clipboard', 'Close', { duration: 2000 });
+    }
+  }
+
+  protected downloadCodesAsTxt(): void {
+    const codesString = this.recoveryCodes().join('\n');
+    const blob = new Blob([codesString], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'my-recovery-codes.txt';
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 
   protected enableTwoFactor(): void {
@@ -94,6 +121,7 @@ export class Security implements OnInit {
   }
 
   protected disableTwoFactor(): void {
+    this.finishSetup();
     this.twoFAService
       .disable()
       .pipe(
@@ -110,6 +138,9 @@ export class Security implements OnInit {
     this.twoFAService
       .enable(this.verificationCode.value ?? '')
       .pipe(
+        tap((res: Enable2FAResponse) => {
+          this.recoveryCodes.set(res.recoveryCodes);
+        }),
         switchMap(() => this.userService.getUserInfo()),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -117,7 +148,7 @@ export class Security implements OnInit {
         next: (userInfo) => {
           this.snackBar.open('2FA Enabled Successfully!', 'Close', { duration: 2000 });
           this.userInfo.set(userInfo);
-          this.isExpanded.set(false);
+          this.expansionStep.set(3);
           this.verificationCode.reset();
         },
         error: (err) =>

@@ -9,3 +9,7 @@ export type SetupResponse = {
   manualEntryKey: string;
   qrCodeImageUrl: string;
 };
+
+export type Enable2FAResponse = {
+  recoveryCodes: string[];
+};

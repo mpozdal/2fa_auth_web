@@ -16,9 +16,14 @@ import { MatIconModule } from '@angular/material/icon';
   `,
 })
 export class GoBackBackComponent {
-  private location = inject(Location);
+  private readonly location = inject(Location);
+  private readonly router = inject(Router)
 
   onClick(): void {
+    if (this.location.path() === '/login' || this.location.path() === '/register') {
+      this.router.navigate(['/']);
+      return;
+    }
     this.location.back();
   }
 }

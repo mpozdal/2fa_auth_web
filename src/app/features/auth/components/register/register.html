@@ -1,6 +1,61 @@
+<app-go-back />
+
 <div class="login-container">
-  <div class="login-form-section"></div>
+  @if(isLoading()) {
+  <div class="spinner-container">
+    <mat-spinner diameter="100"></mat-spinner>
+  </div>
+  }
+  <div class="login-form-section">
+    <mat-card class="login-card">
+      <mat-card-header>
+        <mat-card-title>Create Account</mat-card-title>
+
+        <mat-card-subtitle>Fill out the form to get started.</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="inputs">
+            <mat-form-field class="full-width-input" appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput placeholder="example@example.com" required formControlName="email" />
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field class="full-width-input" appearance="outline">
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                type="password"
+                placeholder="•••••••••••••"
+                required
+                formControlName="password"
+              />
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+            <mat-form-field class="full-width-input" appearance="outline">
+              <mat-label>Confirm Password</mat-label>
+              <input
+                matInput
+                type="password"
+                placeholder="•••••••••••••"
+                required
+                formControlName="password"
+              />
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <button matFab class="login-button" type="submit">Create account</button>
+        </form>
+        <div class="footer">
+          Already have an account? <a class="sign-up-btn" routerLink="/login">Sign In</a>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
   <div class="login-image-section">
-    <img ngSrc="login.svg" width="10" height="10" prority />
+    <img ngSrc="register.svg" width="10" height="10" priority />
   </div>
 </div>
