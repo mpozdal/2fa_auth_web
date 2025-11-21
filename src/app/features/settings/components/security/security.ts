@@ -10,11 +10,12 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard';
-import { ReactiveFormsModule, FormControl, Validators, FormGroup } from '@angular/forms';
+import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { Enable2FAResponse, SetupResponse } from '../../../../shared/models/app.types';
 import { NgOtpInputConfig, NgOtpInputModule } from 'ng-otp-input';
+import { MessageService } from 'primeng/api';
+import { Toast } from "primeng/toast";
 @Component({
   selector: 'app-security',
   imports: [
@@ -25,19 +26,20 @@ import { NgOtpInputConfig, NgOtpInputModule } from 'ng-otp-input';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSnackBarModule,
     ClipboardModule,
     NgOtpInputModule,
-  ],
+    Toast
+],
   templateUrl: './security.html',
   styleUrl: './security.css',
+  providers: [MessageService],
 })
 export class Security implements OnInit {
   private readonly userService = inject(UserService);
   private readonly twoFAService = inject(TwoFAService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly clipboard = inject(Clipboard);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly messageService = inject(MessageService);
 
   protected readonly userInfo = signal<UserInfo | null>(null);
 
@@ -88,7 +90,11 @@ export class Security implements OnInit {
   protected copyCodesToClipboard(): void {
     const codesString = this.recoveryCodes().join('\n');
     if (this.clipboard.copy(codesString)) {
-      this.snackBar.open('Recovery codes copied to clipboard', 'Close', { duration: 2000 });
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Info',
+        detail: 'Recovery codes copied to clipboard',
+      });
     }
   }
 
@@ -130,7 +136,11 @@ export class Security implements OnInit {
       )
       .subscribe((userInfo) => {
         this.userInfo.set(userInfo);
-        this.snackBar.open('2FA Disabled Successfully', 'Close', { duration: 2000 });
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: '2FA Disabled Successfully!',
+        });
       });
   }
 
@@ -146,13 +156,22 @@ export class Security implements OnInit {
       )
       .subscribe({
         next: (userInfo) => {
-          this.snackBar.open('2FA Enabled Successfully!', 'Close', { duration: 2000 });
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: '2FA Enabled Successfully!',
+          });
           this.userInfo.set(userInfo);
           this.expansionStep.set(3);
           this.verificationCode.reset();
         },
-        error: (err) =>
-          this.snackBar.open('Invalid code. Please try again.', 'Close', { duration: 3000 }),
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Invalid code. Please try again!',
+          });
+        },
       });
   }
 
@@ -162,7 +181,11 @@ export class Security implements OnInit {
 
   protected copyKeyToClipboard(): void {
     if (this.clipboard.copy(this.manualEntryKey()!)) {
-      this.snackBar.open('Key copied to clipboard', 'Close', { duration: 2000 });
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Info',
+        detail: 'Key copied to clipboard',
+      });
     }
   }
 }

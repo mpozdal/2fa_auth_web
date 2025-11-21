@@ -27,7 +27,7 @@
             <ng-otp-input
               formControlName="code"
               (onInputChange)="onOtpChange($event)"
-              config="config"
+              [config]="config"
             />
           </div>
 
@@ -36,12 +36,21 @@
         } @else {
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <div class="inputs">
+            <!-- EMAIL -->
             <mat-form-field class="full-width-input" appearance="outline">
               <mat-label>Email</mat-label>
               <input matInput placeholder="example@example.com" required formControlName="email" />
               <mat-icon matSuffix>person</mat-icon>
+
+              <!-- Błędy dla Email -->
+              @if (loginForm.get('email')?.hasError('required')) {
+              <mat-error>Email is required</mat-error>
+              } @if (loginForm.get('email')?.hasError('email')) {
+              <mat-error>Please enter a valid email address</mat-error>
+              }
             </mat-form-field>
 
+            <!-- PASSWORD -->
             <mat-form-field class="full-width-input" appearance="outline">
               <mat-label>Password</mat-label>
               <input
@@ -52,7 +61,15 @@
                 formControlName="password"
               />
               <mat-icon matSuffix>lock</mat-icon>
+
+              <!-- Błędy dla Password -->
+              @if (loginForm.get('password')?.hasError('required')) {
+              <mat-error>Password is required</mat-error>
+              } @if (loginForm.get('password')?.hasError('minlength')) {
+              <mat-error>Password must be at least 8 characters long</mat-error>
+              }
             </mat-form-field>
+
             <a class="forgot" routerLink="/reset-password">Forgot password?</a>
           </div>
 

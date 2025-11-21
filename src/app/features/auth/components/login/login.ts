@@ -18,12 +18,13 @@ import { NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../services/auth-service';
 import { LoginCredentials } from '../../models/auth.models';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, finalize } from 'rxjs';
+import { catchError, EMPTY, finalize } from 'rxjs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
-import { MenuComponent } from '../../../../shared/components/menu/menu.components';
+import { ButtonModule } from 'primeng/button';
 import { GoBackBackComponent } from '../../../../shared/components/back/back.component';
+import { HttpErrorResponse } from '@angular/common/http';
 @Component({
   selector: 'app-login',
   imports: [
@@ -40,6 +41,7 @@ import { GoBackBackComponent } from '../../../../shared/components/back/back.com
     MatProgressSpinnerModule,
     NgOtpInputModule,
     Toast,
+    ButtonModule,
     GoBackBackComponent,
   ],
   templateUrl: './login.html',
@@ -75,6 +77,16 @@ export class Login implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
     });
+  }
+
+  showError(error: HttpErrorResponse) {
+    if (error.status === 401) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Bad login or password!',
+      });
+    }
   }
 
   protected onOtpChange(event: string): void {
@@ -116,7 +128,12 @@ export class Login implements OnInit {
       .login(newLoginCredentials)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isLoading.set(false))
+        finalize(() => this.isLoading.set(false)),
+        catchError((error: unknown) => {
+          this.showError(error as HttpErrorResponse);
+
+          return EMPTY;
+        })
       )
       .subscribe((res) => {
         if (res.value.requiresTwoFactor) {
